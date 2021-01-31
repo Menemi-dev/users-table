@@ -1,0 +1,25 @@
+{
+    "name": "emilia/users-table",
+    "description": "Custom endpoint on WordPress site",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Emilia Mencia",
+            "email": "emilia.mencia@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.2"
+    },
+    "require-dev": {
+        "inpsyde/php-coding-standards": "v1.0.0-beta.1",
+	"brain/monkey": "2.*",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {"UsersTable\\": "."}
+    }
+}
