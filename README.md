@@ -17,12 +17,12 @@ Users Table is a plugin that makes available a custom endpoint on the WordPress 
 </ol>
 
 ## Usage
-The plugin uses a default endpoint on activate in /users. To set a new route go to the admin area, Settings->Users Table Menu. Enter the new name of the endpoint route to use.
+The plugin uses a default endpoint on activate in /users. To set a route go to the admin area, Settings->Users Table Menu. Enter the new name of the endpoint route to use.
 
-To display the users' table. go to the endpoint set before. The table lists all users, to see a user's detail click on the user and the data will be displayed in an area under the table.
+To display the users' table, go to the endpoint set before. The table lists all users, to see a user's detail click on the user and the data will be displayed in an area under the table.
 
 ## Cache for HTTP requests
 The first request to the API brings all the users with their respective details. This data is cached using a local object because we only need it to exist on the page they are created, we don't need to allocate the data across the site.
 
 ## Styling
-The plugin uses minimum custom styling to better the blend to the current theme's general styling
+The plugin uses minimum custom styling to better the blend with the current theme's general styling

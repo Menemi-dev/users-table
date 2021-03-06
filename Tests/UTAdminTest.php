@@ -21,7 +21,7 @@ class UTAdminTest extends TestCase
         $this->instance = new UTAdmin('1.0.0');
 
         stubs(['add_settings_error' => 'Error message']);
-        stubs(['get_option' => ['route' => 'user']]);
+        stubs(['get_option' => 'user']);
     }
 
     /**
@@ -32,14 +32,14 @@ class UTAdminTest extends TestCase
         $values = ['user', 'user 1', 'user@user', ' ', 'false'];
         $expected = ['user', 'user1', '', '', 'false'];
         foreach ($values as $key => $value) {
-            $actual = $this->instance->validateOptions(['route' => $value]);
-            $this->assertEquals(['route' => $expected[$key]], $actual);
+            $actual = $this->instance->validateOptions($value);
+            $this->assertEquals($expected[$key], $actual);
         }
     }
 
     public function testEndpointSettingRoute()
     {
-        $expected = "<input id='endpoint_setting_route' name='users_table_options[route]' type='text' value='user'/>";
+        $expected = "<input id='users_table_route' name='users_table_route' type='text' value='user'/>";
         $this->instance->endpointSettingRoute();
         $this->expectOutput($expected);
     }

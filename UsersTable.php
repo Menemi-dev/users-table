@@ -36,8 +36,16 @@ if (! class_exists('UsersTable')) {
         private $endpoint;
 
         /**
+         * UTAdmin instance
+         *
+         * @var UTAdmin
+         */
+        private $admin;
+
+        /**
          * Initialize the class and set its properties
          */
+
         public function __construct()
         {
             $this->version = '1.0.0';
@@ -47,8 +55,7 @@ if (! class_exists('UsersTable')) {
             }
 
             //Add endpoint
-            $endpoint = new UTEndpoint();
-            $this->endpoint = $endpoint;
+            $this->endpoint = new UTEndpoint();
             $this->endpoint->add();
 
             $this->setupActions();
@@ -73,13 +80,30 @@ if (! class_exists('UsersTable')) {
         }
 
         /**
+         * Activate callback. When the option doesn't exist, set default value.
+         */
+        public static function activate()
+        {
+            flush_rewrite_rules();
+        }
+
+        /**
+         * Deactivate callback
+         */
+        public static function deactivate()
+        {
+            $utAdmin = new UTAdmin();
+            $utAdmin->unregisterOptions();
+            flush_rewrite_rules();
+        }
+
+        /**
          * Register all of the hooks related to the admin area functionality
          */
         private function loadAdmin()
         {
-
-            $pluginAdmin = new UTAdmin($this->version);
-            $pluginAdmin->registerOptions();
+            $this->admin = new UTAdmin($this->version);
+            $this->admin->registerOptions();
         }
 
         /**
@@ -88,30 +112,27 @@ if (! class_exists('UsersTable')) {
         private function loadPublic()
         {
             add_action('wp_enqueue_scripts', [$this, 'publicAssets']);
+            add_filter('template_include', [$this, 'includeCustomTemplate']);
         }
 
         /**
-         * Activate callback. When the option doesn't exist, set default value.
+         * Includes plugin's template for the endpoint
+         *
+         * @param string $template
+         * @return string
          */
-        public static function activate()
+        public function includeCustomTemplate(string $template): string
         {
-            if (get_option('users_table_options') === false) {
-                $options = [];
-                $options['route'] = 'users';
-
-                update_option('users_table_options', $options);
+            global $wp_query;
+            if (!isset($wp_query->query_vars[$this->endpoint->route()])) {
+                return $template;
+            }
+            $templatePath = plugin_dir_path(__FILE__) . 'public/templates/endpoint-template.php';
+            if (file_exists($templatePath)) {
+                return $templatePath;
             }
 
-            $endpoint = new UTEndpoint();
-            $endpoint->addRoute($options['route']);
-        }
-
-        /**
-         * Deactivate callback
-         */
-        public static function deactivate()
-        {
-            delete_option('users_table_options');
+            return $template;
         }
 
         /**
@@ -120,23 +141,23 @@ if (! class_exists('UsersTable')) {
         public function publicAssets()
         {
             global $wp_query;
-            if (isset($wp_query->query_vars[$this->endpoint->getRoute()])) {
+            if (isset($wp_query->query_vars[$this->endpoint->route()])) {
                 wp_enqueue_script(
                     'ut-public-script',
-                    plugin_dir_url(__FILE__) . '/public' . '/js/ut-public-script.js',
+                    plugin_dir_url(__FILE__) . 'public/js/ut-public-script.js',
                     ['jquery'],
                     $this->version,
                     true
                 );
                 wp_enqueue_style(
                     'bootstrap-4',
-                    plugin_dir_url(__FILE__) . '/public' . '/css/bootstrap.min.css',
+                    plugin_dir_url(__FILE__) . 'public/css/bootstrap.min.css',
                     [],
                     '4.5.3'
                 );
                 wp_enqueue_style(
                     'ut-public-style',
-                    plugin_dir_url(__FILE__) . '/public' . '/css/ut-public-style.css',
+                    plugin_dir_url(__FILE__) . 'public/css/ut-public-style.css',
                     [],
                     $this->version
                 );

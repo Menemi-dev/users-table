@@ -21,21 +21,31 @@ if (!class_exists('UTEndpoint')) {
          */
         public function __construct()
         {
-            $this->route = '';
-            $options = get_option('users_table_options');
-            if ($options) {
-                $this->route = $options['route'];
+            $this->route = get_option('users_table_route');
+            if ($this->route === false) {
+                update_option('users_table_route', 'users');
+                $this->addRoute('users');
             }
+        }
+
+        /**
+         * Displays instance's route
+         *
+         * @return string
+         */
+        public function route(): string
+        {
+            return $this->route;
         }
 
         /**
          * Sets new route and adds endpoint
          *
-         * @param string $customRoute
+         * @param string $newRoute
          */
-        public function addRoute(string $customRoute)
+        public function addRoute(string $newRoute)
         {
-            $this->route = $customRoute;
+            $this->route = $newRoute;
             update_option('new_route_added', true);
             $this->add();
         }
@@ -46,7 +56,7 @@ if (!class_exists('UTEndpoint')) {
         public function add()
         {
             add_action('init', [$this, 'addCustomEndpoint']);
-            add_filter('template_include', [$this, 'includeCustomTemplate']);
+            add_action('setup_theme', [$this, 'settingsFlushRewrite']);
         }
 
         /**
@@ -60,37 +70,6 @@ if (!class_exists('UTEndpoint')) {
                 "index.php?{$this->route}={$this->route}",
                 'top'
             );
-            $this->settingsFlushRewrite();
-        }
-
-        /**
-         * Displays instance's routev
-         *
-         * @return string
-         */
-        public function getRoute(): string
-        {
-            return $this->route;
-        }
-        /**
-         * Includes plugin's template for endpoint
-         *
-         * @param string $template
-         * @return string
-         */
-        public function includeCustomTemplate(string $template): string
-        {
-            global $wp_query;
-            if (!isset($wp_query->query_vars[$this->route])) {
-                return $template;
-            }
-
-            $templatePath = plugin_dir_path(__DIR__) . 'public/templates/endpoint-template.php';
-            if (file_exists($templatePath)) {
-                return $templatePath;
-            }
-
-            return $template;
         }
 
         /**
@@ -98,7 +77,7 @@ if (!class_exists('UTEndpoint')) {
          */
         public function settingsFlushRewrite()
         {
-            if (get_option('new_route_added') === true) {
+            if (filter_var(get_option('new_route_added'), FILTER_VALIDATE_BOOLEAN) === true) {
                 flush_rewrite_rules();
                 update_option('new_route_added', false);
             }

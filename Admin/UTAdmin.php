@@ -17,9 +17,14 @@ if (! class_exists('UTAdmin')) {
         {
             add_action('admin_menu', [$this, 'addSettingsPage']);
             add_action('admin_init', [$this, 'registerSettings']);
-            add_action('updated_option', [$this, 'updatedRoute'], 10, 3);
+            add_action('update_option_users_table_route', [$this, 'updatedRoute'], 10, 2);
         }
 
+        public function unregisterOptions()
+        {
+            unregister_setting('users_table_options', 'users_table_route');
+            delete_option('users_table_route');
+        }
         /**
          * Creates options page
          */
@@ -29,7 +34,7 @@ if (! class_exists('UTAdmin')) {
                 'Users Table',
                 'Users Table Menu',
                 'manage_options',
-                'users-table-menu',
+                'users_table',
                 [$this, 'renderPluginSettingsPage']
             );
         }
@@ -59,7 +64,11 @@ if (! class_exists('UTAdmin')) {
          */
         public function registerSettings()
         {
-            register_setting('users_table_options', 'users_table_options', [ $this, 'validateOptions']);
+            register_setting(
+                'users_table_options',
+                'users_table_route',
+                [$this, 'validateOptions']
+            );
             add_settings_section(
                 'endpoint_settings',
                 'Endpoint Settings',
@@ -67,7 +76,7 @@ if (! class_exists('UTAdmin')) {
                 'users_table'
             );
             add_settings_field(
-                'endpoint_setting_route',
+                'users_table_route',
                 'Route',
                 [$this, 'endpointSettingRoute'],
                 'users_table',
@@ -78,15 +87,15 @@ if (! class_exists('UTAdmin')) {
         /**
          * Validates entered route in options page
          *
-         * @param array $input
-         * @return array
+         * @param string $input
+         * @return string
          */
-        public function validateOptions(array $input): array
+        public function validateOptions(string $input): string
         {
             //removes whitespaces
-            $newinput['route'] = str_replace(' ', '', $input['route']);
-            if (preg_match('/[^a-zA-Z0-9-_\d]/', $newinput['route']) !== 0) {
-                $newinput['route'] = '';
+            $newinput = str_replace(' ', '', $input);
+            if (preg_match('/[^a-zA-Z0-9-_\d]/', $newinput) !== 0) {
+                $newinput = '';
                 add_settings_error(
                     'users_table_route',
                     'settings_updated',
@@ -103,8 +112,10 @@ if (! class_exists('UTAdmin')) {
          */
         public function endpointSectionText()
         {
-            echo '<p>Here you can set the route for the endpoint where the Users Table will be displayed.
-            You can only use letters, numbers, dashes, and underscores</p>';
+            echo '<p>
+            Here you can set the route for the endpoint where the Users Table will be displayed.
+            You can only use letters, numbers, dashes, and underscores
+            </p>';
         }
 
         /**
@@ -112,25 +123,24 @@ if (! class_exists('UTAdmin')) {
          */
         public function endpointSettingRoute()
         {
-            $options = get_option('users_table_options');
-            echo "<input id='endpoint_setting_route' name='users_table_options[route]' type='text' value='";
-            echo ($options) ? esc_attr($options['route']) : "";
+            $options = get_option('users_table_route');
+            echo "<input id='users_table_route' name='users_table_route' type='text' value='";
+            echo ($options) ? esc_attr($options) : "";
             echo "'/>";
         }
 
         /**
          * Updates route field
          *
-         * @param string $optionName
-         * @param mixed $oldValue
-         * @param mixed $value
+         * @param string $oldValue
+         * @param string $value
          */
-        public function updatedRoute(string $optionName, $oldValue, $value)
+        public function updatedRoute(string $oldValue, string $value)
         {
-            if ($optionName === "users_table_options") {
-                if ($oldValue['route'] !== $value['route']) {
+            if (is_string($value)) {
+                if ($oldValue !== $value) {
                     $endpoint = new UTEndpoint();
-                    $endpoint->addRoute($value['route']);
+                    $endpoint->addRoute($value);
                 }
             }
         }

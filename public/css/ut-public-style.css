@@ -1,14 +1,15 @@
 #userTable a.table-link {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     text-decoration: none;
+    word-break: break-word;
 }
 
 #userDetails span {
     font-weight: 900;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 768px) {
     #userTable a.table-link {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
     }
 }

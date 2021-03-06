@@ -12,11 +12,11 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.2"
+        "php": "^7.1"
     },
     "require-dev": {
-        "inpsyde/php-coding-standards": "v1.0.0-beta.1",
-	"brain/monkey": "2.*",
+        "inpsyde/php-coding-standards": "dev-master",
+	    "brain/monkey": "2.*",
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {
