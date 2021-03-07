@@ -1,20 +1,14 @@
 <?php
 
-/**
- * Plugin Name: Users Table
- * Version: 1.0.0
- * Description: Provides a custom endpoint to display a users table
- * Author: Emilia Mencia <emilia.mencia@gmail.com>
- */
-
 declare(strict_types=1);
 
 namespace UsersTable;
 
-require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
-
 use UsersTable\Admin\UTAdmin;
 use UsersTable\Includes\UTEndpoint;
+
+define('BASE_PATH', plugin_dir_path(__FILE__));
+define('BASE_URL', plugin_dir_url(__FILE__));
 
 if (! class_exists('UsersTable')) {
 
@@ -49,10 +43,6 @@ if (! class_exists('UsersTable')) {
         public function __construct()
         {
             $this->version = '1.0.0';
-
-            if (file_exists(plugin_dir_path(__FILE__) . '/vendor/autoload.php')) {
-                require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
-            }
 
             //Add endpoint
             $this->endpoint = new UTEndpoint();
@@ -127,7 +117,7 @@ if (! class_exists('UsersTable')) {
             if (!isset($wp_query->query_vars[$this->endpoint->route()])) {
                 return $template;
             }
-            $templatePath = plugin_dir_path(__FILE__) . 'public/templates/endpoint-template.php';
+            $templatePath = BASE_PATH . 'public/templates/endpoint-template.php';
             if (file_exists($templatePath)) {
                 return $templatePath;
             }
@@ -144,20 +134,20 @@ if (! class_exists('UsersTable')) {
             if (isset($wp_query->query_vars[$this->endpoint->route()])) {
                 wp_enqueue_script(
                     'ut-public-script',
-                    plugin_dir_url(__FILE__) . 'public/js/ut-public-script.js',
+                    BASE_URL . 'public/js/ut-public-script.js',
                     ['jquery'],
                     $this->version,
                     true
                 );
                 wp_enqueue_style(
                     'bootstrap-4',
-                    plugin_dir_url(__FILE__) . 'public/css/bootstrap.min.css',
+                    BASE_URL . 'public/css/bootstrap.min.css',
                     [],
                     '4.5.3'
                 );
                 wp_enqueue_style(
                     'ut-public-style',
-                    plugin_dir_url(__FILE__) . 'public/css/ut-public-style.css',
+                    BASE_URL . 'public/css/ut-public-style.css',
                     [],
                     $this->version
                 );
@@ -166,6 +156,3 @@ if (! class_exists('UsersTable')) {
     }
 
 }
-
-// Instantiate the plugin class
-$usersTable = new UsersTable();

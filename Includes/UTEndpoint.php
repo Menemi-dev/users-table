@@ -66,7 +66,7 @@ if (!class_exists('UTEndpoint')) {
         {
             add_rewrite_endpoint($this->route, EP_PERMALINK | EP_PAGES);
             add_rewrite_rule(
-                "{$this->route}/?",
+                "{$this->route}/?$",
                 "index.php?{$this->route}={$this->route}",
                 'top'
             );
