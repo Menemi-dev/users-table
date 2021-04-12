@@ -5,7 +5,7 @@ Users Table is a plugin that makes available a custom endpoint on the WordPress 
 ### Requirements
 <ul>
 <li>PHP 7.2 or greater</li>
-<li>Wordpress 4.4 or greater</li>
+<li>WordPress 4.4 or greater</li>
 </ul>
 
 ## Steps
