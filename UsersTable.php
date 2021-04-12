@@ -54,8 +54,7 @@ if (! class_exists('UsersTable')) {
             $isAdmin = is_admin();
             if ($isAdmin) {
                 $this->loadAdmin();
-            }
-            if (! $isAdmin) {
+            else {
                 $this->loadPublic();
             }
         }
